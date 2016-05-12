@@ -2,6 +2,7 @@ import Html exposing (..)
 import Html.App as Html
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
+import Json.Decode as Json
 
 
 main =
@@ -51,6 +52,7 @@ init {userId} =
 
 type Msg
   = Input String
+  | SendOnEnter Int
 
 
 update : Msg -> Model -> (Model, Cmd Msg)
@@ -60,6 +62,18 @@ update msg model =
       ( { model | input = newInput }
       , Cmd.none
       )
+
+    SendOnEnter code ->
+      if code == 13 then
+        let
+          messages =
+            Message model.userId model.input :: model.messages
+        in
+          ( { model | input = "", messages = messages }
+          , Cmd.none
+          )
+      else
+        (model, Cmd.none)
 
 
 -- SUBSCRIPTIONS
@@ -77,7 +91,14 @@ view : Model -> Html Msg
 view model =
   div []
     [ ul [ class "message-list" ] (List.map chatMessage model.messages)
-    , input [ type' "text", class "new-message-field", autofocus True, onInput Input ] []
+    , input
+      [ type' "text"
+      , class "new-message-field"
+      , autofocus True
+      , value model.input
+      , onInput Input
+      , onKeyPress SendOnEnter
+      ] []
     ]
 
 
@@ -91,3 +112,8 @@ chatMessage {authorId, message} =
       [ img [ class "avatar", src avatarUrl ] []
       , span [ class "message-text" ] [ text message ]
       ]
+
+
+onKeyPress : (Int -> msg) -> Attribute msg
+onKeyPress tagger =
+  on "keypress" (Json.map tagger keyCode)
