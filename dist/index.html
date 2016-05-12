@@ -1,0 +1,47 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <style>
+      * { box-sizing: border-box; }
+      html {
+        font: 100%/1.2 -apple-system, "Helvetica Neue", Helvetica, Arial, sans-serif;
+      }
+      #app {
+        max-width: 35rem;
+        margin: 0 auto;
+      }
+      .message-list {
+        list-style: none;
+        padding-left: 0;
+      }
+      .message {
+        margin-bottom: 0.25rem;
+      }
+      .message > * {
+        vertical-align: middle;
+      }
+      .avatar {
+        width: 50px;
+        height: 50px;
+        margin-right: 0.5rem;
+        border-radius: 50%;
+      }
+      .new-message-field {
+        font-size: 1.25rem;
+        width: 100%;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app"></div>
+    <script src="/horizon/horizon.js"></script>
+    <script src="app.js"></script>
+    <script>
+      var el = document.getElementById('app');
+      var app = Elm.Main.embed(app, {
+        userId: Date.now().toString()
+      });
+    </script>
+  </body>
+</html>

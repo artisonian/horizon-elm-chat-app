@@ -1,0 +1,16 @@
+{
+  "name": "horizon-chat",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "elm make src/Chat.elm --output dist/app.js",
+    "watch": "watch \"elm make src/Chat.elm --output dist/app.js\" src"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "watch": "^0.18.0"
+  }
+}

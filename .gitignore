@@ -1,0 +1,4 @@
+.hz
+rethinkdb_data
+elm-stuff
+dist/app.js
