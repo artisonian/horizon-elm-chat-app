@@ -38,9 +38,33 @@
     <script src="/horizon/horizon.js"></script>
     <script src="app.js"></script>
     <script>
-      var el = document.getElementById('app');
-      var app = Elm.Main.embed(app, {
+      var root = document.querySelector('#app');
+      var app = Elm.Main.embed(root, {
         userId: Date.now().toString()
+      });
+      var horizon = Horizon();
+      var collection = horizon('elm_chat');
+      var messages$ = collection
+        .order('datetime', 'descending')
+        .limit(8)
+        .watch();
+      messages$.subscribe(
+        function (messages) {
+          app.ports.fromHorizon.send(messages);
+        },
+        function (err) {
+          console.error(err);
+        },
+        function () {
+          console.debug('done');
+        }
+      );
+      app.ports.save.subscribe(function (message) {
+        collection.store({
+          authorId: message.authorId,
+          datetime: new Date(),
+          message: message.message
+        });
       });
     </script>
   </body>

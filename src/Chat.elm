@@ -1,3 +1,6 @@
+port module Main exposing (..)
+
+
 import Html exposing (..)
 import Html.App as Html
 import Html.Attributes exposing (..)
@@ -37,12 +40,7 @@ type alias Flags =
 
 init : Flags -> (Model, Cmd Msg)
 init {userId} =
-  ( Model userId ""
-    [ Message "1" "Hello world"
-    , Message "1" "Goodbye world"
-    , Message "2" "O hai"
-    , Message "1" "K thx bye"
-    ]
+  ( Model userId "" []
   , Cmd.none
   )
 
@@ -53,6 +51,10 @@ init {userId} =
 type Msg
   = Input String
   | SendOnEnter Int
+  | Fetch (List Message)
+
+
+port save : Message -> Cmd msg
 
 
 update : Msg -> Model -> (Model, Cmd Msg)
@@ -66,22 +68,30 @@ update msg model =
     SendOnEnter code ->
       if code == 13 then
         let
-          messages =
-            Message model.userId model.input :: model.messages
+          message =
+            Message model.userId model.input
         in
-          ( { model | input = "", messages = messages }
-          , Cmd.none
+          ( { model | input = "" }
+          , save message
           )
       else
         (model, Cmd.none)
+
+    Fetch messages ->
+      ( { model | messages = messages }
+      , Cmd.none
+      )
 
 
 -- SUBSCRIPTIONS
 
 
+port fromHorizon : (List Message -> msg) -> Sub msg
+
+
 subscriptions : Model -> Sub Msg
 subscriptions model =
-  Sub.none
+  fromHorizon Fetch
 
 
 -- VIEW
