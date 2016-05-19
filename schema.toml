@@ -3,12 +3,14 @@
 [collections.elm_chat]
 indexes = ["datetime"]
 
+[groups.authenticated]
+[groups.authenticated.rules.read_chat]
+template = "collection('elm_chat').anyRead()"
+[groups.authenticated.rules.read_self]
+template = "collection('users').find({id: userId()}).anyRead()"
+[groups.authenticated.rules.write_chat]
+template = "collection('elm_chat').store({authorId: userId(), datetime: any(), message: any()})"
+
 [groups.admin]
 [groups.admin.rules.carte_blanche]
 template = "any()"
-
-[groups.authenticated.rules.read_chat]
-template = "collection('elm_chat').anyRead()"
-
-[groups.authenticated.rules.write_chat]
-template = "collection('elm_chat').store({authorId: userId(), datetime: any(), message: any()})"
