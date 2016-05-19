@@ -1,16 +1,20 @@
 {
   "name": "horizon-chat",
   "version": "1.0.0",
-  "description": "",
+  "description": "Horizon Chat app example ported to Elm",
   "main": "index.js",
   "scripts": {
     "build": "elm make src/Chat.elm --output dist/app.js",
-    "watch": "watch \"elm make src/Chat.elm --output dist/app.js\" src"
+    "watch": "watch \"elm make src/Chat.elm --output dist/app.js\" src",
+    "prestart": "npm run build",
+    "start": "hz serve --dev --allow-anonymous yes"
   },
   "keywords": [],
   "author": "",
   "license": "MIT",
   "devDependencies": {
+    "elm": "^0.17.0",
+    "horizon": "^1.0.1",
     "watch": "^0.18.0"
   }
 }
