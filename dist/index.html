@@ -38,34 +38,36 @@
     <script src="/horizon/horizon.js"></script>
     <script src="app.js"></script>
     <script>
-      var root = document.querySelector('#app');
-      var app = Elm.Main.embed(root, {
-        userId: Date.now().toString()
-      });
-      var horizon = Horizon();
-      var collection = horizon('elm_chat');
-      var messages$ = collection
-        .order('datetime', 'descending')
-        .limit(8)
-        .watch();
-      messages$.subscribe(
-        function (messages) {
-          app.ports.fromHorizon.send(messages);
-        },
-        function (err) {
-          console.error(err);
-        },
-        function () {
-          console.debug('done');
-        }
-      );
-      app.ports.save.subscribe(function (message) {
-        collection.store({
-          authorId: message.authorId,
-          datetime: new Date(),
-          message: message.message
+      var horizon = Horizon({ authType: 'anonymous' });
+      horizon.connect();
+      horizon.currentUser().fetch().subscribe(initWithUser, logError);
+
+      function initWithUser (user) {
+        var root = document.querySelector('#app');
+        var app = Elm.Main.embed(root, { userId: user.id });
+        var collection = horizon('elm_chat');
+        collection
+          .order('datetime', 'descending')
+          .limit(8)
+          .watch()
+          .subscribe(
+            function (messages) {
+              app.ports.fromHorizon.send(messages);
+            },
+            logError
+          );
+        app.ports.save.subscribe(function (message) {
+          collection.store({
+            authorId: message.authorId,
+            datetime: new Date(),
+            message: message.message
+          });
         });
-      });
+      }
+
+      function logError (err) {
+        console.error(err);
+      }
     </script>
   </body>
 </html>

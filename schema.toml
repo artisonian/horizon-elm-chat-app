@@ -1,0 +1,14 @@
+# This is a TOML document
+
+[collections.elm_chat]
+indexes = ["datetime"]
+
+[groups.admin]
+[groups.admin.rules.carte_blanche]
+template = "any()"
+
+[groups.authenticated.rules.read_chat]
+template = "collection('elm_chat').anyRead()"
+
+[groups.authenticated.rules.write_chat]
+template = "collection('elm_chat').store({authorId: userId(), datetime: any(), message: any()})"
