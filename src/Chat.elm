@@ -38,19 +38,29 @@ type alias Flags =
   }
 
 
+emptyModel : Model
+emptyModel =
+  { userId = ""
+  , input = ""
+  , messages = []
+  }
+
+
 init : Flags -> (Model, Cmd Msg)
 init {userId} =
-  ( Model userId "" []
-  , Cmd.none
-  )
+  { emptyModel
+    | userId = userId
+  }
+    ! []
 
 
 -- UPDATE
 
 
 type Msg
-  = Input String
-  | SendOnEnter Int
+  = NoOp
+  | UpdateInput String
+  | Save
   | Fetch (List Message)
 
 
@@ -60,27 +70,20 @@ port save : Message -> Cmd msg
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
   case msg of
-    Input newInput ->
-      ( { model | input = newInput }
-      , Cmd.none
-      )
+    NoOp ->
+      model ! []
 
-    SendOnEnter code ->
-      if code == 13 then
-        let
-          message =
-            Message model.userId model.input
-        in
-          ( { model | input = "" }
-          , save message
-          )
-      else
-        (model, Cmd.none)
+    UpdateInput newInput ->
+      { model | input = newInput }
+        ! []
+
+    Save ->
+      { model | input = "" }
+        ! [ save (Message model.userId model.input) ]
 
     Fetch messages ->
-      ( { model | messages = messages }
-      , Cmd.none
-      )
+      { model | messages = messages }
+        ! []
 
 
 -- SUBSCRIPTIONS
@@ -106,8 +109,8 @@ view model =
       , class "new-message-field"
       , autofocus True
       , value model.input
-      , onInput Input
-      , onKeyPress SendOnEnter
+      , onInput UpdateInput
+      , onEnter NoOp Save
       ] []
     ]
 
@@ -124,6 +127,10 @@ chatMessage {authorId, message} =
       ]
 
 
-onKeyPress : (Int -> msg) -> Attribute msg
-onKeyPress tagger =
-  on "keypress" (Json.map tagger keyCode)
+onEnter : msg -> msg -> Attribute msg
+onEnter fail success =
+  let
+    tagger code =
+      if code == 13 then success else fail
+  in
+    on "keyup" (Json.map tagger keyCode)
