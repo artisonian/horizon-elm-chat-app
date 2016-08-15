@@ -6,5 +6,6 @@ An example demonstrating how to use Horizon in Elm 0.17 using ports.
 
 ```sh
 npm install
+hz init
 npm start
 ```
